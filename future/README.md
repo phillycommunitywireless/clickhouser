@@ -1,0 +1,13 @@
+## Environment variables
+
+Add the following variables to your shell environment:
+
+CLICKHOUSE_HOST
+CLICKHOUSE_PORT
+CLICKHOUSE_USER
+CLICKHOUSE_PASSWORD
+CLICKHOUSE_DB
+
+BOTO3_ACCESS_KEY
+BOTO3_SECRET_KEY
+BOTO3_ENDPOINT_URL

@@ -1,0 +1,2 @@
+boto3>=1.38,<1.39
+clickhouse-driver>=0.2,<0.3
