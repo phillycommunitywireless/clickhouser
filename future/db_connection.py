@@ -135,5 +135,15 @@ def initialize_database():
         ) ENGINE = Log
     ''')
 
+def validate_database():
+    client = get_db_client()
+    tables_to_check = ['list_clients', 'injest_log']
+    for table in tables_to_check:
+        try:
+            client.execute(f"SELECT count(*) FROM {table} LIMIT 1")
+        except Exception:
+            print(f"Error: {table} table not found. Run the db_connection script and try again.")
+            exit(1)
+
 if __name__ == "__main__":
     initialize_database()
