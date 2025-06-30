@@ -32,7 +32,10 @@ directly to the file .venv/bin/activate that was created with the previous
 command:
 
 ```sh
-export AWS_URL="https://us-east-1.linodeobjects.com/your-bucket-name"
+export AWS_URL="region.objectstorage.com"
+export AWS_BUCKET="your-bucket-name"
+export AWS_ACCESS_KEY_ID=ACCESS_KEY
+export AWS_SECRET_ACCESS_KEY=SECRET_ACCESS_KEY
 export CLICKHOUSE_HOST=localhost
 export CLICKHOUSE_PORT=19000
 export CLICKHOUSE_USER=default

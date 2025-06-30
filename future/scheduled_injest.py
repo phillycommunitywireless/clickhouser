@@ -2,6 +2,7 @@ import db_connection
 from datetime import datetime
 import sys
 import os
+from urllib.parse import urlparse
 
 def log_injest_event(s3_url, row_count, row_count_today, insert_count, insert_query=None, error=None, new_row_count=None, new_row_count_today=None):
     client = db_connection.get_db_client()
@@ -12,13 +13,33 @@ def log_injest_event(s3_url, row_count, row_count_today, insert_count, insert_qu
     )
 
 def get_aws_url():
-    if 'AWS_URL' in os.environ:
+    """Get AWS URL and bucket from environment variables, format correctly for Clickhouse"""
+    if 'AWS_URL' in os.environ and 'AWS_BUCKET' in os.environ:
         aws_url = os.environ['AWS_URL']
+        # Make sure the URL is formatted correctly
+        if aws_url.startswith('http://'):
+            aws_url = aws_url[7:]
+        elif aws_url.startswith('https://'):
+            aws_url = aws_url[8:]
+        if not aws_url.endswith('/'):
+            aws_url += '/'
+
+        aws_bucket = os.environ['AWS_BUCKET']
     else:
-        print("Error: AWS_URL environment variable is not set.")
+        print("Error: AWS_URL and AWS_BUCKET environment variable is not set.")
         sys.exit(1)
     
-    return aws_url
+    url = f"https://{aws_url}{aws_bucket}"
+    # Validate the URL format
+    try:
+        result = urlparse(url)
+        if not all([result.scheme, result.netloc]):
+            raise ValueError("Invalid AWS URL format")
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+    
+    return url
 
 def get_date_prefix():
     if len(sys.argv) > 1:
@@ -35,7 +56,8 @@ def get_date_prefix():
     return date_prefix
 
 
-def injest(aws_url, date_prefix):
+def main(aws_url, date_prefix):
+    db_connection.validate_database()
     client = db_connection.get_db_client()
 
     # Query the database to get the current count of rows
@@ -81,5 +103,4 @@ def injest(aws_url, date_prefix):
 if __name__ == "__main__":
     aws_url = get_aws_url()
     date_prefix = get_date_prefix()
-    db_connection.validate_database()
-    injest(aws_url, date_prefix)
+    main(aws_url, date_prefix)
