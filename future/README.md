@@ -93,6 +93,14 @@ You can also supply a different date:
 python3 scheduled_injest.py "2025/06/05"
 ```
 
+## Reporting
+
+You can also run `python3 check_missing_paths.py` to get a report on any JSON
+files currently in object storage that have not been injested. Adding the `--save`
+switch will save the full list to a text file.
+
+It may be advisable to run this periodically, to ensure that no files were missed.
+
 ## Logs
 
 All injest events are logged in the injest_log table. To open a ClickHouse
