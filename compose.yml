@@ -1,0 +1,23 @@
+services:
+  # the clickhouse server 
+  clickhouser:
+    image: clickhouse/clickhouse-server
+    container_name: pcw-clickhouse
+    env_file: .env
+    volumes:
+      # mounted volume for initial setup script 
+      - "./setup_scripts/load_retroactive.sh:/docker-entrypoint-initdb.d/load_retroactive.sh" 
+    ulimits:
+      nofile:
+        262144
+    ports:
+      - 18123:8123
+      - 19000:9000
+
+  # WIP - python container for performing future injest 
+  # injest: 
+  #   dockerfile: injest_dockerfile
+  #   container_name: injest-python
+  #   env_file: .env
+  #   depends_on: 
+  #     - clickhouser

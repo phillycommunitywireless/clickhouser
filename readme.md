@@ -1,26 +1,29 @@
-# ClickHouse PCW controller data injestion script.
+# `pcw/clickhouser`
+This repo provides scripts to initialize a Clickhouse container with retroactive PCW network data for querying and analysis, as well as provides an injest script to load network data added after initial setup. 
 
-This script injests any new list_clients files for the current date (or an
-arbitrary date) from object storage. It can be run as many times per day as
-needed; if there is no new data it will simply exit.
+## Loading retroactive network data 
+
+This uses built-in functionality of the `clickhouse` container to load retroactive network data, specifically 
+running a setup script following db initialization that 
+1) Creates a new database 
+2) Creates tables for previous years by loading data directly from s3 
+
+This requires mounting a volume that contains the setup script, which is 
+contained in `./setup_scripts`
+
+You will also need a `.env` file that contains 
+
+**$schema goes here**
+
+# λ docker run -it --rm --network=container:pcw-clickhouse --entrypoint clickhouse-client clickhouse/clickhouse-server --user pcw
+
+
+# Injesting future data
+
+This script injests any new list_clients files for the current date (or an arbitrary date) from object storage. It can be run as many times per day as needed; if there is no new data it will simply exit.
 
 ## Installation
-
-Create a ClickHouse container with credentials for Linode object storage:
-
-```sh
-docker run -d -p 18123:8123 -p19000:9000 -e CLICKHOUSE_PASSWORD=YOUR+PASSWORD \
-  -e CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1 \
-  -e AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY \
-  -e AWS_SECRET_ACCESS_KEY=YOUR_SECRET_ACCESS_KEY --name pcw-clickhouse \
-  --ulimit nofile=262144:262144 clickhouse/clickhouse-server
-```
-
-Change all the values above as appropriate.
-
-Note there are better ways to pass these credentials, such as an .env file.
-Should update this doc later with that.
-
+### Native using a virtual environment
 Now set up the python virtual environment:
 
 ```sh
@@ -42,6 +45,8 @@ export CLICKHOUSE_USER=default
 export CLICKHOUSE_PASSWORD=password
 export CLICKHOUSE_DB=default
 ```
+
+(For Windows, replace `export` with `set` in your virtual environment)
 
 Obviously, replace the password and any other values as needed.
 
@@ -116,3 +121,22 @@ To see the last log entry, try:
 ```sql
 SELECT * FROM injest_log ORDER BY time DESC LIMIT 1 FORMAT Vertical
 ```
+
+
+
+
+---
+
+
+# old/busted/archive
+## past
+To run the container with the mounted volume, run the following command: 
+
+```docker
+docker run -d --env-file .env -v "%cd%/setup_scripts":/docker-entrypoint-initdb.d --name some-clickhouse-server --ulimit nofile=262144:262144 clickhouse/clickhouse-server
+```
+
+To run the clickhouse client: 
+`docker run -it --rm --network=container:some-clickhouse-server --entrypoint clickhouse-client clickhouse/clickhouse-server`
+
+## future

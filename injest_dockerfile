@@ -1,0 +1,21 @@
+FROM python:latest
+
+WORKDIR /injest
+
+# Install requirements 
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+# Copy file to init schema 
+COPY db_connection.py db_connection.py
+# Copy file to perform injest 
+COPY scheduled_injest.py scheduled_injest.py
+
+ENTRYPOINT [ "python3" ]
+# docker run -it img_name db_connection.py 
+# docker run -it img_name scheduled_injest.py 
+
+
+
+
+
