@@ -15,7 +15,7 @@ You will also need a `.env` file that contains
 
 **$schema goes here**
 
-# λ docker run -it --rm --network=container:pcw-clickhouse --entrypoint clickhouse-client clickhouse/clickhouse-server --user pcw
+To set up the container, simply `docker compose up`. The container will load retroactive data, then restart. 
 
 
 # Injesting future data
@@ -61,6 +61,10 @@ Install dependencies:
 ```
 pip install -r requirements.txt
 ```
+
+## Container 
+* TODO - see `injest_dockerfile`
+* `docker build . -t injest` / `docker run -it injest [db_connection.py, scheduled_injest.py]`
 
 ## Database setup
 
@@ -122,21 +126,13 @@ To see the last log entry, try:
 SELECT * FROM injest_log ORDER BY time DESC LIMIT 1 FORMAT Vertical
 ```
 
-
-
-
----
-
-
-# old/busted/archive
-## past
-To run the container with the mounted volume, run the following command: 
-
+# Querying the data 
+To query the database, run a `clickhouse-client` container 
 ```docker
-docker run -d --env-file .env -v "%cd%/setup_scripts":/docker-entrypoint-initdb.d --name some-clickhouse-server --ulimit nofile=262144:262144 clickhouse/clickhouse-server
+docker run -it --rm --network=container:pcw-clickhouse --entrypoint clickhouse-client clickhouse/clickhouse-server --user pcw
 ```
 
-To run the clickhouse client: 
-`docker run -it --rm --network=container:some-clickhouse-server --entrypoint clickhouse-client clickhouse/clickhouse-server`
-
-## future
+To run the server container on it's own and not part of a Compose stack: 
+```docker
+docker run -d --env-file .env -v "./setup_scripts/load_retroactive.sh:/docker-entrypoint-initdb.d --name some-clickhouse-server --ulimit nofile=262144:262144 clickhouse/clickhouse-server
+```
