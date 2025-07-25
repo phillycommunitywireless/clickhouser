@@ -6,13 +6,26 @@ services:
     env_file: .env
     volumes:
       # mounted volume for initial setup script 
-      - "./setup_scripts/load_retroactive.sh:/docker-entrypoint-initdb.d/load_retroactive.sh" 
+      - "./setup_scripts/load_retroactive.sh:/docker-entrypoint-initdb.d/load_retroactive.sh"
+      # - ./run/clickhouse/users.xml:/etc/clickhouse-server/users.xml
+      - clickhouse-storage:/var/lib/clickhouse/
+      - clickhouse-logs:/var/log/clickhouse-server
     ulimits:
       nofile:
         262144
     ports:
       - 18123:8123
       - 19000:9000
+    environment:
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
 
   # WIP - python container for performing future injest 
   # injest: 
@@ -21,3 +34,8 @@ services:
   #   env_file: .env
   #   depends_on: 
   #     - clickhouser
+
+volumes:
+  grafana-storage:
+  clickhouse-storage:
+  clickhouse-logs:

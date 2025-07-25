@@ -136,3 +136,6 @@ To run the server container on it's own and not part of a Compose stack:
 ```docker
 docker run -d --env-file .env -v "./setup_scripts/load_retroactive.sh:/docker-entrypoint-initdb.d --name some-clickhouse-server --ulimit nofile=262144:262144 clickhouse/clickhouse-server
 ```
+
+## Grafana
+Running `docker compose up` will start Grafana at `localhost:3000`. At this time, it's just a blank Grafana, so you'll need to manually install the Clickhouse plugin and configure the Clickhouse data source using the `CLICKHOUSE_USER` and `CLICKHOUSE_PASSWORD` in your .env file. Plugins are under the Administration tab in the left sidebar in the Grafana UI.

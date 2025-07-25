@@ -48,6 +48,8 @@ clickhouse client -n <<-EOSQL
     # -------------------------------------------------------------------------------------------------------- #
     # -------------------------------------------------------------------------------------------------------- #
 
+    CREATE DATABASE IF NOT EXISTS pcw_clickhouse;
+
     # list_clients
     # create table w/ schema 
     CREATE TABLE IF NOT EXISTS pcw_clickhouse.list_clients (
