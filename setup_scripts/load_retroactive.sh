@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "loading retroactive data..."
+echo "start loading historical data at time $(date +%F_%T)"
 
 clickhouse client -n <<-EOSQL
     # allow nullable columns to be PKs 
@@ -47,6 +47,8 @@ clickhouse client -n <<-EOSQL
 
     # -------------------------------------------------------------------------------------------------------- #
     # -------------------------------------------------------------------------------------------------------- #
+
+    CREATE DATABASE IF NOT EXISTS pcw_clickhouse;
 
     # list_clients
     # create table w/ schema 
@@ -161,7 +163,7 @@ clickhouse client -n <<-EOSQL
     ORDER BY _id;
 
     # insert retroactive records
-    insert into pcw_clickhouse.list_clients (*) select * from s3('$DATA_URL_FY25_2', '$S3_ACCESS_KEY', '$S3_SECRET_KEY');
+    insert into pcw_clickhouse.list_clients (*) select * from s3('$DATA_PATH_S3_PATTERN', '$S3_ACCESS_KEY', '$S3_SECRET_KEY');
 
     # now do list_events 
     
@@ -212,4 +214,4 @@ clickhouse client -n <<-EOSQL
     insert into pcw_clickhouse.list_clients (*) select * from s3('$DATA_URL_LIST_EVENTS', '$S3_ACCESS_KEY', '$S3_SECRET_KEY');
 EOSQL
 
-echo "done loading retroactive data!"
+echo "done loading historical data at time $(date +%F_%T)!"
