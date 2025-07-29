@@ -12,8 +12,22 @@ This requires mounting a volume that contains the setup script, which is
 contained in `./setup_scripts`
 
 You will also need a `.env` file that contains 
+```
+AWS_ACCESS_KEY_ID - your access key 
+AWS_SECRET_ACCESS_KEY - your secret key 
+CLICKHOUSE_USER - username for clickhouse cli
+CLICKHOUSE_PASSWORD - password for the given user 
+CLICKHOUSE_DB= - name of the db to load data into 
+CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+AWS_URL - bucket URL (just the endpoint) 
+AWS_BUCKET - bucket name 
+CLICKHOUSE_HOST - localhost 
+CLICKHOUSE_PORT - 19000 (mapped in compose) 
 
-**$schema goes here**
+DATA_URL_FY1/2 -  path for the load_retroactive script list_clients endpoint, should be the full object storage url - eg, https://AWS_URL/AWS_BUCKET/yyyy/mm/dd/list_clients--*
+
+DATA_URL_LIST_EVENTS - path for path for the load_retroactive script list_events endpoint, should be the full object storage url - eg, AWS_URL/AWS_BUCKET/yyyy/mm/dd/list_events--*
+```
 
 To set up the container, simply `docker compose up`. The container will load retroactive data, then restart. 
 
