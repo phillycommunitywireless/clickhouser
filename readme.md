@@ -139,3 +139,12 @@ docker run -d --env-file .env -v "./setup_scripts/load_retroactive.sh:/docker-en
 
 ## Grafana
 Running `docker compose up` will start Grafana at `localhost:3000`. At this time, it's just a blank Grafana, so you'll need to manually install the Clickhouse plugin and configure the Clickhouse data source using the `CLICKHOUSE_USER` and `CLICKHOUSE_PASSWORD` in your .env file. Plugins are under the Administration tab in the left sidebar in the Grafana UI.
+
+### Configuring the Clickhouse Data Source
+* Install the ClickHouse plugin 
+* server address - Clickhouse container name 
+* port - Clickhouse container port env variable 
+* username/password - Clickhouse User/Password env variables 
+
+
+`docker compose down -v` to also remove volumes to re-init the app from scratch 

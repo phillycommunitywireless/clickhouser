@@ -163,8 +163,7 @@ clickhouse client -n <<-EOSQL
     ORDER BY _id;
 
     # insert retroactive records
-    insert into pcw_clickhouse.list_clients (*) select * from s3('$DATA_PATH_S3_PATTERN', '$S3_ACCESS_KEY', '$S3_SECRET_KEY');
-
+    insert into pcw_clickhouse.list_clients (*) select * from s3('$DATA_URL_FY25_2', '$AWS_ACCESS_KEY_ID', '$AWS_SECRET_ACCESS_KEY');
     # now do list_events 
     
     CREATE TABLE IF NOT EXISTS pcw_clickhouse.list_events (
@@ -211,7 +210,7 @@ clickhouse client -n <<-EOSQL
     ORDER BY _id;
 
     # insert retroactive records
-    insert into pcw_clickhouse.list_clients (*) select * from s3('$DATA_URL_LIST_EVENTS', '$S3_ACCESS_KEY', '$S3_SECRET_KEY');
+    insert into pcw_clickhouse.list_events (*) select * from s3('$DATA_URL_LIST_EVENTS', '$AWS_ACCESS_KEY_ID', '$AWS_SECRET_ACCESS_KEY');
 EOSQL
 
 echo "done loading historical data at time $(date +%F_%T)!"
