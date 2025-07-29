@@ -56,23 +56,23 @@ def get_date_prefix():
     return date_prefix
 
 
-def main(aws_url, date_prefix):
+def main(aws_url, date_prefix, endpoint=None):
     db_connection.validate_database()
     client = db_connection.get_db_client()
 
     # Query the database to get the current count of rows
-    row_count = client.execute("SELECT count(*) FROM list_clients")[0][0]
-    print(f"Row count for list_clients: {row_count}")
+    row_count = client.execute(f"SELECT count(*) FROM {endpoint}")[0][0]
+    print(f"Row count for {endpoint}: {row_count}")
 
     # Get a count of rows in list_clients whose _path contains today's date
-    row_count_today = client.execute(f"SELECT count(*) FROM list_clients WHERE _path LIKE 'pcw-data-cron/{date_prefix}%'")[0][0]
-    print(f"Row count for list_clients where _path contains \"{date_prefix}\" {row_count_today}")
+    row_count_today = client.execute(f"SELECT count(*) FROM {endpoint} WHERE _path LIKE 'pcw-data-cron/{date_prefix}%'")[0][0]
+    print(f"Row count for {endpoint} where _path contains \"{date_prefix}\" {row_count_today}")
 
     # Construct the S3 URL with today's date
-    s3_url = f"{aws_url}/{date_prefix}/list_clients--**.json"
+    s3_url = f"{aws_url}/{date_prefix}/{endpoint}--**.json"
 
     # Execute the INSERT query
-    path_select = "SELECT DISTINCT _path FROM list_clients"
+    path_select = f"SELECT DISTINCT _path FROM {endpoint}"
     count_query = f"SELECT count(*) FROM s3('{s3_url}') WHERE _path NOT IN ({path_select})"
     insert_count = client.execute(count_query)[0][0]
     print(f"Rows to insert: {insert_count}")
@@ -81,7 +81,7 @@ def main(aws_url, date_prefix):
         log_injest_event(s3_url, row_count, row_count_today, insert_count)
         sys.exit(0)
 
-    insert_query = f"INSERT INTO list_clients SELECT _path,* FROM s3('{s3_url}') WHERE _path NOT IN ({path_select})"
+    insert_query = f"INSERT INTO {endpoint} SELECT _path,* FROM s3('{s3_url}') WHERE _path NOT IN ({path_select})"
     print()
     print(f"Running query: {insert_query}")
     print()
@@ -94,13 +94,14 @@ def main(aws_url, date_prefix):
         sys.exit(1)
 
     print(f"Query successful.")
-    new_row_count = client.execute("SELECT count(*) FROM list_clients")[0][0]
-    print(f"Row count for list_clients: {new_row_count}")
-    new_row_count_today = client.execute(f"SELECT count(*) FROM list_clients WHERE _path LIKE 'pcw-data-cron/{date_prefix}%'")[0][0]
-    print(f"Row count for list_clients where _path contains \"{date_prefix}\": {new_row_count_today}")
+    new_row_count = client.execute(f"SELECT count(*) FROM {endpoint}")[0][0]
+    print(f"Row count for {endpoint}: {new_row_count}")
+    new_row_count_today = client.execute(f"SELECT count(*) FROM {endpoint} WHERE _path LIKE 'pcw-data-cron/{date_prefix}%'")[0][0]
+    print(f"Row count for {endpoint} where _path contains \"{date_prefix}\": {new_row_count_today}")
     log_injest_event(s3_url, row_count, row_count_today, insert_count, insert_query, None, new_row_count, new_row_count_today)
 
 if __name__ == "__main__":
     aws_url = get_aws_url()
     date_prefix = get_date_prefix()
-    main(aws_url, date_prefix)
+    main(aws_url, date_prefix, "list_clients")
+    main(aws_url, date_prefix, "list_events")

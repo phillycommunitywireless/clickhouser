@@ -120,6 +120,51 @@ def initialize_database():
         ORDER BY _id
     ''')
 
+    client.execute('''
+        CREATE TABLE IF NOT EXISTS list_events (
+            _path String, 
+            msg String, 
+            channel_from String, 
+            ap_model String, 
+            ap_displayName String, 
+            subsystem String, 
+            ap String, 
+            ap_name String, 
+            time Int64, 
+            datetime String, 
+            radio_from String, 
+            site_id String,
+            _id String, 
+            user String, 
+            radio_to String, 
+            channel_to String, 
+            is_negative Bool, 
+            key String, 
+            ap_to String, 
+            channel String, 
+            ssid String, 
+            radio String, 
+            ap_from String, 
+            bb String, 
+            bb_name String,
+            bb_displayName String, 
+            bb_model String, 
+            essid String, 
+            mac String, 
+            rogue_channel String, 
+            name String, 
+            signal_strength Int64, 
+            hostname String, 
+            sw_model String, 
+            sw_displayName String, 
+            sw String, 
+            network String, 
+            num_sta Int64             
+        )
+        ENGINE = MergeTree()
+        ORDER BY _id
+    ''')
+
     # Create the injest_log table if it doesn't exist
     client.execute('''
         CREATE TABLE IF NOT EXISTS injest_log (
